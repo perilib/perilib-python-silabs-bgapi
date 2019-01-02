@@ -1,2 +1,2 @@
 # .py files
-from . import silabs_bgapi
+from .silabs_bgapi import *

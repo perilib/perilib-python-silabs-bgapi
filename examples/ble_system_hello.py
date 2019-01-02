@@ -3,14 +3,26 @@ import time
 try:
     # standard library installation
     import perilib
-    from perilib.protocol.stream.silabs.bgapi import SilabsBGAPIProtocol
+    print("Detected standard perilib-python installation")
 except ImportError as e:
     # local development installation
     import sys
-    sys.path.insert(0, "../../perilib-python-core")
-    sys.path.insert(0, "..")
-    import perilib
-    from silabs_bgapi import SilabsBGAPIProtocol
+    sys.path.insert(0, "../../../..") # submodule upwards to perilib root
+    sys.path.insert(0, ".") # submodule root
+    try:
+        import perilib
+        print("Detected development perilib-python installation run from submodule root")
+    except ImportError as e:
+        sys.path.insert(0, "../../../../..") # submodule/examples upwards to perilib root
+        sys.path.insert(0, "..") # submodule/examples upwards to submodule root
+        try:
+            import perilib
+            print("Detected development perilib-python installation run from submodule/example folder")
+        except ImportError as e:
+            print("Unable to find perilib-python installation, cannot continue")
+            sys.exit(1)
+
+from perilib.protocol.stream.silabs_bgapi import SilabsBGAPIProtocol
 
 class App():
 
