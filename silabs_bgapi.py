@@ -179,7 +179,7 @@ class SilabsBGAPIPacket(perilib.protocol.stream.core.StreamPacket):
     TYPE_STR = ["command", "response", "event"]
     TYPE_ARG_CONTEXT = ["command_args", "response_args", "event_args"]
 
-    def prepend_header_to_buffer(self):
+    def prepare_buffer_after_building(self):
         # determine header length based on current buffer
         payload_length = len(self.buffer)
         header = struct.pack("4B", \
