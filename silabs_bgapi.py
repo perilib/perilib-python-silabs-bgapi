@@ -119,7 +119,7 @@ class SilabsBGAPIProtocol(perilib.protocol.stream.core.StreamProtocol):
         # split "ble_cmd_system_hello" into relevant parts
         parts = _packet_name.split('_', maxsplit=3)
         if len(parts) != 4:
-            raise perilib.core.PerilibProtocolException("Invalid packet name specified")
+            raise perilib.core.PerilibProtocolException("Invalid packet name '%s' specified" % _packet_name)
 
         # find the entry in the protocol definition table
         (technology_type_str, message_type_str, group_name, method_name) = parts
