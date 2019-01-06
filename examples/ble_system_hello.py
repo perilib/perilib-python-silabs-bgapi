@@ -33,7 +33,7 @@ class App():
         self.parser_generator.on_rx_error = self.on_rx_error
 
         # set up data stream (detects incoming serial data as well as USB removal)
-        self.data_stream = perilib.protocol.stream.serial.SerialStream(parser_generator=self.parser_generator)
+        self.data_stream = perilib.hal.serial.SerialStream(parser_generator=self.parser_generator)
         self.data_stream.on_open_stream = self.on_open_stream
         self.data_stream.on_close_stream = self.on_close_stream
         self.data_stream.on_tx_packet = self.on_tx_packet
