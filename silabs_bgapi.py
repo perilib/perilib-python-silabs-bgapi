@@ -60,7 +60,7 @@ class SilabsBGAPIProtocol(perilib.protocol.stream.core.StreamProtocol):
         # not finished if we made it here
         return perilib.protocol.stream.core.ParserGenerator.STATUS_IN_PROGRESS
 
-    def get_packet_from_buffer(self, buffer, port_info=None, is_tx=False):
+    def get_packet_from_buffer(self, buffer, parser_generator=None, is_tx=False):
         (type_data, payload_length, group_id, method_id) = struct.unpack("4B", buffer[0:4])
         message_type = (type_data & 0x80) >> 7
         technology_type = (type_data & 0x78) >> 3
@@ -105,17 +105,17 @@ class SilabsBGAPIProtocol(perilib.protocol.stream.core.StreamProtocol):
 
         if technology_type == 0x0:
             # Bluetooth Low Energy (ble_...)
-            packet = SilabsBGAPIBLEPacket(type=packet_type, name=packet_name, definition=packet_definition, buffer=buffer, metadata=packet_metadata, port_info=port_info)
+            packet = SilabsBGAPIBLEPacket(type=packet_type, name=packet_name, definition=packet_definition, buffer=buffer, metadata=packet_metadata, parser_generator=parser_generator)
         elif technology_type == 0x1:
             # Wi-Fi (wifi_...)
-            packet = SilabsBGAPIWifiPacket(type=packet_type, name=packet_name, definition=packet_definition, buffer=buffer, metadata=packet_metadata, port_info=port_info)
+            packet = SilabsBGAPIWifiPacket(type=packet_type, name=packet_name, definition=packet_definition, buffer=buffer, metadata=packet_metadata, parser_generator=parser_generator)
         elif technology_type == 0x4:
             # Bluetooth dual-mode BR/EDR+LE (dumo_...)
-            packet = SilabsBGAPIDumoPacket(type=packet_type, name=packet_name, definition=packet_definition, buffer=buffer, metadata=packet_metadata, port_info=port_info)
+            packet = SilabsBGAPIDumoPacket(type=packet_type, name=packet_name, definition=packet_definition, buffer=buffer, metadata=packet_metadata, parser_generator=parser_generator)
 
         return packet
 
-    def get_packet_from_name_and_args(self, _packet_name, _port_info, **kwargs):
+    def get_packet_from_name_and_args(self, _packet_name, _parser_generator, **kwargs):
         # split "ble_cmd_system_hello" into relevant parts
         parts = _packet_name.split('_', maxsplit=3)
         if len(parts) != 4:
@@ -155,15 +155,16 @@ class SilabsBGAPIProtocol(perilib.protocol.stream.core.StreamProtocol):
                                     "method_id": method_id,
                                 }
 
+                                # create technology-specific packet type
                                 if technology_type == 0x0:
                                     # Bluetooth Low Energy (ble_...)
-                                    packet = SilabsBGAPIBLEPacket(type=packet_type, name=_packet_name, definition=packet_definition, payload=kwargs, metadata=packet_metadata, port_info=_port_info)
+                                    packet = SilabsBGAPIBLEPacket(type=packet_type, name=_packet_name, definition=packet_definition, payload=kwargs, metadata=packet_metadata, parser_generator=_parser_generator)
                                 elif technology_type == 0x1:
                                     # Wi-Fi (wifi_...)
-                                    packet = SilabsBGAPIWifiPacket(type=packet_type, name=_packet_name, definition=packet_definition, payload=kwargs, metadata=packet_metadata, port_info=_port_info)
+                                    packet = SilabsBGAPIWifiPacket(type=packet_type, name=_packet_name, definition=packet_definition, payload=kwargs, metadata=packet_metadata, parser_generator=_parser_generator)
                                 elif technology_type == 0x4:
                                     # Bluetooth dual-mode BR/EDR+LE (dumo_...)
-                                    packet = SilabsBGAPIDumoPacket(type=packet_type, name=_packet_name, definition=packet_definition, payload=kwargs, metadata=packet_metadata, port_info=_port_info)
+                                    packet = SilabsBGAPIDumoPacket(type=packet_type, name=_packet_name, definition=packet_definition, payload=kwargs, metadata=packet_metadata, parser_generator=_parser_generator)
 
                                 return packet
 
