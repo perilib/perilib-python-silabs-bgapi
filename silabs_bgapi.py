@@ -161,7 +161,7 @@ class SilabsBGAPIProtocol(perilib.protocol.stream.core.StreamProtocol):
                                 elif technology_type == 0x1:
                                     # Wi-Fi (wifi_...)
                                     packet = SilabsBGAPIWifiPacket(type=packet_type, name=_packet_name, definition=packet_definition, payload=kwargs, metadata=packet_metadata, port_info=_port_info)
-                                elif technology_type == 0x2:
+                                elif technology_type == 0x4:
                                     # Bluetooth dual-mode BR/EDR+LE (dumo_...)
                                     packet = SilabsBGAPIDumoPacket(type=packet_type, name=_packet_name, definition=packet_definition, payload=kwargs, metadata=packet_metadata, port_info=_port_info)
 
