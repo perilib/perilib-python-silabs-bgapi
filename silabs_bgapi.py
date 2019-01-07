@@ -48,7 +48,8 @@ class SilabsBGAPIProtocol(perilib.protocol.stream.core.StreamProtocol):
         }
     }
 
-    def test_packet_complete(self, buffer, is_tx=False):
+    @classmethod
+    def test_packet_complete(cls, buffer, is_tx=False):
         # make sure we have at least the header
         if len(buffer) > 3:
             # check 11-bit "length" field in 4-byte header
@@ -60,7 +61,8 @@ class SilabsBGAPIProtocol(perilib.protocol.stream.core.StreamProtocol):
         # not finished if we made it here
         return perilib.protocol.stream.core.ParserGenerator.STATUS_IN_PROGRESS
 
-    def get_packet_from_buffer(self, buffer, parser_generator=None, is_tx=False):
+    @classmethod
+    def get_packet_from_buffer(cls, buffer, parser_generator=None, is_tx=False):
         (type_data, payload_length, group_id, method_id) = struct.unpack("4B", buffer[0:4])
         message_type = (type_data & 0x80) >> 7
         technology_type = (type_data & 0x78) >> 3
@@ -105,17 +107,19 @@ class SilabsBGAPIProtocol(perilib.protocol.stream.core.StreamProtocol):
 
         if technology_type == 0x0:
             # Bluetooth Low Energy (ble_...)
-            packet = SilabsBGAPIBLEPacket(type=packet_type, name=packet_name, definition=packet_definition, buffer=buffer, metadata=packet_metadata, parser_generator=parser_generator)
+            return SilabsBGAPIBLEPacket(type=packet_type, name=packet_name, definition=packet_definition, buffer=buffer, metadata=packet_metadata, parser_generator=parser_generator)
         elif technology_type == 0x1:
             # Wi-Fi (wifi_...)
-            packet = SilabsBGAPIWifiPacket(type=packet_type, name=packet_name, definition=packet_definition, buffer=buffer, metadata=packet_metadata, parser_generator=parser_generator)
+            return SilabsBGAPIWifiPacket(type=packet_type, name=packet_name, definition=packet_definition, buffer=buffer, metadata=packet_metadata, parser_generator=parser_generator)
         elif technology_type == 0x4:
             # Bluetooth dual-mode BR/EDR+LE (dumo_...)
-            packet = SilabsBGAPIDumoPacket(type=packet_type, name=packet_name, definition=packet_definition, buffer=buffer, metadata=packet_metadata, parser_generator=parser_generator)
+            return SilabsBGAPIDumoPacket(type=packet_type, name=packet_name, definition=packet_definition, buffer=buffer, metadata=packet_metadata, parser_generator=parser_generator)
 
-        return packet
+        # unable to find correct packet
+        raise perilib.core.PerilibProtocolException("Unable to identify packet from buffer [%s]" % ' '.join(["%02X" % b for b in buffer]))
 
-    def get_packet_from_name_and_args(self, _packet_name, _parser_generator, **kwargs):
+    @classmethod
+    def get_packet_from_name_and_args(cls, _packet_name, _parser_generator, **kwargs):
         # split "ble_cmd_system_hello" into relevant parts
         parts = _packet_name.split('_', maxsplit=3)
         if len(parts) != 4:
@@ -158,15 +162,13 @@ class SilabsBGAPIProtocol(perilib.protocol.stream.core.StreamProtocol):
                                 # create technology-specific packet type
                                 if technology_type == 0x0:
                                     # Bluetooth Low Energy (ble_...)
-                                    packet = SilabsBGAPIBLEPacket(type=packet_type, name=_packet_name, definition=packet_definition, payload=kwargs, metadata=packet_metadata, parser_generator=_parser_generator)
+                                    return SilabsBGAPIBLEPacket(type=packet_type, name=_packet_name, definition=packet_definition, payload=kwargs, metadata=packet_metadata, parser_generator=_parser_generator)
                                 elif technology_type == 0x1:
                                     # Wi-Fi (wifi_...)
-                                    packet = SilabsBGAPIWifiPacket(type=packet_type, name=_packet_name, definition=packet_definition, payload=kwargs, metadata=packet_metadata, parser_generator=_parser_generator)
+                                    return SilabsBGAPIWifiPacket(type=packet_type, name=_packet_name, definition=packet_definition, payload=kwargs, metadata=packet_metadata, parser_generator=_parser_generator)
                                 elif technology_type == 0x4:
                                     # Bluetooth dual-mode BR/EDR+LE (dumo_...)
-                                    packet = SilabsBGAPIDumoPacket(type=packet_type, name=_packet_name, definition=packet_definition, payload=kwargs, metadata=packet_metadata, parser_generator=_parser_generator)
-
-                                return packet
+                                    return SilabsBGAPIDumoPacket(type=packet_type, name=_packet_name, definition=packet_definition, payload=kwargs, metadata=packet_metadata, parser_generator=_parser_generator)
 
         # unable to find correct packet
         raise perilib.core.PerilibProtocolException("Unable to locate packet definition for '%s'" % _packet_name)
