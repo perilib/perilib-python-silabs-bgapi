@@ -66,7 +66,7 @@ def main():
     while True:
         for stream_id, stream in app.manager.streams.items():
             if stream.is_open:
-                stream.send("ble_cmd_system_hello")
+                stream.parser_generator.send("ble_cmd_system_hello")
         time.sleep(1)
 
 if __name__ == '__main__':
