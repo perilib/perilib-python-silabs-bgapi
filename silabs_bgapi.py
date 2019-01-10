@@ -10,7 +10,8 @@ class SilabsBGAPIProtocol(perilib.protocol.stream.core.StreamProtocol):
         { "name": "method", "type": "uint8" }
     ]
 
-    rx_packet_timeout = 1.2
+    response_packet_timeout = 0.5
+    incoming_packet_timeout = 1.2
 
     commands = {
         0: { # technology_type = 0x0 (BLE)

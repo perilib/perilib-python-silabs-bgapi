@@ -25,7 +25,8 @@ class App():
         self.manager.on_rx_packet = self.on_rx_packet                   # triggered by parser/generator
         self.manager.on_tx_packet = self.on_tx_packet                   # triggered by parser/generator
         self.manager.on_rx_error = self.on_rx_error                     # triggered by parser/generator
-        self.manager.on_packet_timeout = self.on_packet_timeout         # triggered by parser/generator
+        self.manager.on_incoming_packet_timeout = self.on_incoming_packet_timeout   # triggered by parser/generator
+        self.manager.on_response_packet_timeout = self.on_response_packet_timeout   # triggered by parser/generator
         self.manager.auto_open = perilib.hal.serial.SerialManager.AUTO_OPEN_ALL
 
         # start monitoring for devices
@@ -58,8 +59,11 @@ class App():
     def on_rx_error(self, e, rx_buffer, parser_generator):
         print("[%.03f] ERROR: %s (raw data: [%s] via %s)" % (time.time(), e, ' '.join(["%02X" % b for b in rx_buffer]), parser_generator))
 
-    def on_packet_timeout(self, e, rx_buffer, parser_generator):
-        print("[%.03f] TIMEOUT: %s (raw data: [%s] via %s)" % (time.time(), e, ' '.join(["%02X" % b for b in rx_buffer]), parser_generator))
+    def on_incoming_packet_timeout(self, rx_buffer, parser_generator):
+        print("[%.03f] RXP TIMEOUT: partial packet data: [%s] via %s" % (time.time(), ' '.join(["%02X" % b for b in rx_buffer]), parser_generator))
+
+    def on_response_packet_timeout(self, waiting_for, parser_generator):
+        print("[%.03f] RSP TIMEOUT: waiting for %s via %s" % (time.time(), waiting_for, parser_generator))
 
 def main():
     app = App()
