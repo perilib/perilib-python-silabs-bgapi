@@ -1,7 +1,7 @@
 import perilib
 import struct
 
-class SilabsBGAPIProtocol(perilib.protocol.stream.core.StreamProtocol):
+class SilabsBGAPIProtocol(perilib.protocol.stream.StreamProtocol):
 
     header_args = [
         { "name": "type", "type": "uint8" },
@@ -57,10 +57,10 @@ class SilabsBGAPIProtocol(perilib.protocol.stream.core.StreamProtocol):
             (payload_length,) = struct.unpack(">H", buffer[0:2])
             payload_length = payload_length & 0x3FF
             if len(buffer) == payload_length + 4:
-                return perilib.protocol.stream.core.StreamParserGenerator.STATUS_COMPLETE
+                return perilib.protocol.stream.StreamParserGenerator.STATUS_COMPLETE
 
         # not finished if we made it here
-        return perilib.protocol.stream.core.StreamParserGenerator.STATUS_IN_PROGRESS
+        return perilib.protocol.stream.StreamParserGenerator.STATUS_IN_PROGRESS
 
     @classmethod
     def get_packet_from_buffer(cls, buffer, parser_generator=None, is_tx=False):
@@ -92,7 +92,7 @@ class SilabsBGAPIProtocol(perilib.protocol.stream.core.StreamProtocol):
                     SilabsBGAPIProtocol.events[technology_type][group_id]["name"], \
                     SilabsBGAPIProtocol.events[technology_type][group_id][method_id]["name"])
         except KeyError as e:
-            raise perilib.core.PerilibProtocolException(
+            raise perilib.PerilibProtocolException(
                             "Could not find packet definition for "
                             "technology type %d, group %d, and method %d" \
                             % (technology_type, group_id, method_id))
@@ -117,14 +117,14 @@ class SilabsBGAPIProtocol(perilib.protocol.stream.core.StreamProtocol):
             return SilabsBGAPIDumoPacket(type=packet_type, name=packet_name, definition=packet_definition, buffer=buffer, metadata=packet_metadata, parser_generator=parser_generator)
 
         # unable to find correct packet
-        raise perilib.core.PerilibProtocolException("Unable to identify packet from buffer [%s]" % ' '.join(["%02X" % b for b in buffer]))
+        raise perilib.PerilibProtocolException("Unable to identify packet from buffer [%s]" % ' '.join(["%02X" % b for b in buffer]))
 
     @classmethod
     def get_packet_from_name_and_args(cls, _packet_name, _parser_generator, **kwargs):
         # split "ble_cmd_system_hello" into relevant parts
         parts = _packet_name.split('_', maxsplit=3)
         if len(parts) != 4:
-            raise perilib.core.PerilibProtocolException("Invalid packet name '%s' specified" % _packet_name)
+            raise perilib.PerilibProtocolException("Invalid packet name '%s' specified" % _packet_name)
 
         # find the entry in the protocol definition table
         (technology_type_str, message_type_str, group_name, method_name) = parts
@@ -172,9 +172,9 @@ class SilabsBGAPIProtocol(perilib.protocol.stream.core.StreamProtocol):
                                     return SilabsBGAPIDumoPacket(type=packet_type, name=_packet_name, definition=packet_definition, payload=kwargs, metadata=packet_metadata, parser_generator=_parser_generator)
 
         # unable to find correct packet
-        raise perilib.core.PerilibProtocolException("Unable to locate packet definition for '%s'" % _packet_name)
+        raise perilib.PerilibProtocolException("Unable to locate packet definition for '%s'" % _packet_name)
 
-class SilabsBGAPIPacket(perilib.protocol.stream.core.StreamPacket):
+class SilabsBGAPIPacket(perilib.protocol.stream.StreamPacket):
 
     TYPE_COMMAND = 0
     TYPE_RESPONSE = 1
