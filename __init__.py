@@ -1,2 +1,2 @@
 # .py files
-from .silabs_bgapi import *
+from .protocol import *
