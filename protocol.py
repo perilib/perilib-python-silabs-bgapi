@@ -2,6 +2,22 @@ import perilib
 import struct
 
 class SilabsBGAPIProtocol(perilib.protocol.stream.StreamProtocol):
+    """Silicon Labs BGAPI protocol definition.
+    
+    This class describes the binary BGAPI protocol used to communicate with
+    some of the modules from Bluegiga (now Silicon Labs), specifically BLE112,
+    BLE113, BLE121LR, WF121, WGM110, and BT121. This protocol follows a basic
+    command-response pattern, and also includes events sent from the module to
+    the host at unpredictable times when certain activities occur, such as a
+    new connection from a remote device, or incoming data.
+    
+    Command/response pairs are defined together, each with their own set of
+    arguments. Events are defined in a separate dictionary and have only one
+    argument set. The protocol is divided by technology type (`ble`, `wifi`, and
+    `dumo` to match the definitions in the original BGAPI host implementations),
+    then subdivided into group and method names. Packet names are generated
+    using these categories along with the packet type, yielding names such as
+    `ble_cmd_system_hello` and `wifi_evt_endpoint_data`."""
 
     header_args = [
         { "name": "type", "type": "uint8" },
@@ -175,6 +191,13 @@ class SilabsBGAPIProtocol(perilib.protocol.stream.StreamProtocol):
         raise perilib.PerilibProtocolException("Unable to locate packet definition for '%s'" % _packet_name)
 
 class SilabsBGAPIPacket(perilib.protocol.stream.StreamPacket):
+    """Base BGAPI packet class.
+    
+    This class provides the structure for all BGAPI packets. It is identical to
+    the parent StreamPacket class except that it provides three types instead of
+    just one, and it overrides the buffer preparation method so that the header
+    data in the binary buffer is properly filled based on packet metadata when
+    creating a packet from a name and argument list."""
 
     TYPE_COMMAND = 0
     TYPE_RESPONSE = 1
