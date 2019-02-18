@@ -29,9 +29,6 @@ class App():
         self.manager.on_response_packet_timeout = self.on_response_packet_timeout   # triggered by parser/generator
         self.manager.auto_open = perilib.hal.serial.SerialManager.AUTO_OPEN_ALL
 
-        # start monitoring for devices
-        self.manager.start()
-
     def on_connect_device(self, device):
         print("[%.03f] CONNECTED: %s" % (time.time(), device))
 
@@ -67,11 +64,17 @@ class App():
 
 def main():
     app = App()
+    last_tick = 0
     while True:
-        for stream_id, stream in app.manager.streams.items():
-            if stream.is_open:
-                stream.parser_generator.send_packet("ble_cmd_system_hello")
-        time.sleep(1)
+        app.manager.process()
+        if time.time() - last_tick > 1:
+            last_tick = time.time()
+            for stream_id, stream in app.manager.streams.items():
+                if stream.is_open:
+                    stream.parser_generator.send_packet("ble_cmd_system_hello")
+                    
+        # tiny delay prevents awful CPU usage
+        time.sleep(0.001)
 
 if __name__ == '__main__':
     try:
