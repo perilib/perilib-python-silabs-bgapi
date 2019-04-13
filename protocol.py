@@ -1,7 +1,7 @@
 import perilib
 import struct
 
-class SilabsBGAPIProtocol(perilib.protocol.stream.StreamProtocol):
+class SilabsBGAPIProtocol(perilib.StreamProtocol):
     """Silicon Labs BGAPI protocol definition.
     
     This class describes the binary BGAPI protocol used to communicate with
@@ -73,10 +73,10 @@ class SilabsBGAPIProtocol(perilib.protocol.stream.StreamProtocol):
             (payload_length,) = struct.unpack(">H", buffer[0:2])
             payload_length = payload_length & 0x3FF
             if len(buffer) == payload_length + 4:
-                return perilib.protocol.stream.StreamParserGenerator.STATUS_COMPLETE
+                return perilib.ParseStatus.COMPLETE
 
         # not finished if we made it here
-        return perilib.protocol.stream.StreamParserGenerator.STATUS_IN_PROGRESS
+        return perilib.ParseStatus.IN_PROGRESS
 
     @classmethod
     def get_packet_from_buffer(cls, buffer, parser_generator=None, is_tx=False):
@@ -172,7 +172,7 @@ class SilabsBGAPIProtocol(perilib.protocol.stream.StreamProtocol):
         # unable to find correct packet
         raise perilib.PerilibProtocolException("Unable to locate packet definition for '%s'" % _packet_name)
 
-class SilabsBGAPIPacket(perilib.protocol.stream.StreamPacket):
+class SilabsBGAPIPacket(perilib.StreamPacket):
     """BGAPI packet class.
     
     This class provides the structure for all BGAPI packets. It is identical to

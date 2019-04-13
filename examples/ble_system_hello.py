@@ -6,16 +6,16 @@ if "perilib-python-core" in path_parts:
 
 import time
 import perilib
-import perilib.protocol.stream.silabs_bgapi
+import perilib.silabs_bgapi
 
 class App():
 
     def __init__(self):
         # set up manager (detects USB insertion/removal, creates data stream and parser/generator instances as needed)
-        self.manager = perilib.hal.serial.SerialManager(
-            stream_class=perilib.hal.serial.SerialStream,
-            protocol_class=perilib.protocol.stream.silabs_bgapi.SilabsBGAPIProtocol)
-        self.manager.device_filter = lambda device: device.port_info.vid == 0x2458 and device.port_info.pid == 0x0001
+        self.manager = perilib.hal.UartManager(
+            stream_class=perilib.hal.UartStream,
+            protocol_class=perilib.silabs_bgapi.SilabsBGAPIProtocol)
+        self.manager.device_filter = lambda device: device.stream.port_info.vid == 0x2458 and device.stream.port_info.pid == 0x0001
         self.manager.on_connect_device = self.on_connect_device         # triggered by manager when running
         self.manager.on_disconnect_device = self.on_disconnect_device   # triggered by manager when running (if stream is closed) or stream (if stream is open)
         self.manager.on_open_stream = self.on_open_stream               # triggered by stream
@@ -27,7 +27,7 @@ class App():
         self.manager.on_rx_error = self.on_rx_error                     # triggered by parser/generator
         self.manager.on_incoming_packet_timeout = self.on_incoming_packet_timeout   # triggered by parser/generator
         self.manager.on_response_packet_timeout = self.on_response_packet_timeout   # triggered by parser/generator
-        self.manager.auto_open = perilib.hal.serial.SerialManager.AUTO_OPEN_ALL
+        self.manager.auto_open = perilib.hal.UartManager.AUTO_OPEN_ALL
 
     def on_connect_device(self, device):
         print("[%.03f] CONNECTED: %s" % (time.time(), device))
