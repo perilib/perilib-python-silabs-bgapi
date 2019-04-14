@@ -66,13 +66,13 @@ class SilabsBGAPIProtocol(perilib.StreamProtocol):
     }
 
     @classmethod
-    def test_packet_complete(cls, buffer, is_tx=False):
-        # make sure we have at least the header
-        if len(buffer) > 3:
+    def test_packet_complete(cls, buffer, new_byte, is_tx=False):
+        # make sure we have at least the header (3 buffered bytes + new byte)
+        if len(buffer) >= 3:
             # check 11-bit "length" field in 4-byte header
             (payload_length,) = struct.unpack(">H", buffer[0:2])
             payload_length = payload_length & 0x3FF
-            if len(buffer) == payload_length + 4:
+            if len(buffer) + 1 == payload_length + 4:
                 return perilib.ParseStatus.COMPLETE
 
         # not finished if we made it here
