@@ -7,4 +7,5 @@ Energy modules, WF121 and WGM110 Wifi modules, and BT121 Bluetooth Smart Ready
 """
 
 # .py files
-from .protocol import *
+from .SilabsBGAPIProtocol import *
+from .SilabsBGAPIPacket import *

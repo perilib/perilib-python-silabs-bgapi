@@ -1,6 +1,8 @@
 import perilib
 import struct
 
+from .SilabsBGAPIPacket import *
+
 class SilabsBGAPIProtocol(perilib.StreamProtocol):
     """Silicon Labs BGAPI protocol definition.
     
