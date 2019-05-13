@@ -12,9 +12,7 @@ class App():
 
     def __init__(self):
         # set up manager (detects USB insertion/removal, creates data stream and parser/generator instances as needed)
-        self.manager = perilib.hal.UartManager(
-            stream_class=perilib.hal.UartStream,
-            protocol_class=perilib.silabs_bgapi.SilabsBGAPIProtocol)
+        self.manager = perilib.hal.UartManager(protocol_class=perilib.silabs_bgapi.SilabsBGAPIProtocol)
         self.manager.device_filter = lambda device: device.stream.port_info.vid == 0x2458 and device.stream.port_info.pid == 0x0001
         self.manager.on_connect_device = self.on_connect_device         # triggered by manager when running
         self.manager.on_disconnect_device = self.on_disconnect_device   # triggered by manager when running (if stream is closed) or stream (if stream is open)
