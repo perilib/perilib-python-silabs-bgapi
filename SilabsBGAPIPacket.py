@@ -22,9 +22,9 @@ class SilabsBGAPIPacket(perilib.StreamPacket):
         payload_length = len(self.buffer)
         header = struct.pack("4B", \
             (self.metadata["message_type"] << 7) \
-                | (self.metadata["technology_type"] << 6) \
-                | ((payload_length >> 8) << 3), \
-            (payload_length & 0xFF), \
+                | (self.metadata["technology_type"] << 3) \
+                | (payload_length >> 8),
+            (payload_length & 0xFF),
             self.metadata["group_id"],
             self.metadata["method_id"])
 
