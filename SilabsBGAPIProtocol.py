@@ -130,12 +130,12 @@ class SilabsBGAPIProtocol(perilib.StreamProtocol):
     @classmethod
     def get_packet_from_name_and_args(cls, _packet_name, _parser_generator=None, **kwargs):
         # split "ble_cmd_system_hello" into relevant parts
-        parts = _packet_name.split('_', maxsplit=3)
-        if len(parts) != 4:
+        parts = _packet_name.split('_', maxsplit=2)
+        if len(parts) != 3:
             raise perilib.PerilibProtocolException("Invalid packet name '%s' specified" % _packet_name)
 
         # find the entry in the protocol definition table
-        (technology_type_str, message_type_str, group_name, method_name) = parts
+        (technology_type_str, message_type_str, short_name) = parts
         packet_definition = None
         if message_type_str == "evt":
             search = SilabsBGAPIProtocol.events
@@ -153,7 +153,8 @@ class SilabsBGAPIProtocol(perilib.StreamProtocol):
                 for group_id in search[technology_type]:
                     if type(group_id) == str:
                         continue
-                    if search[technology_type][group_id]["name"] == group_name:
+                    if search[technology_type][group_id]["name"] == short_name[:len(search[technology_type][group_id]["name"])]:
+                        method_name = short_name[len(search[technology_type][group_id]["name"]) + 1:]
                         for method_id in search[technology_type][group_id]:
                             if type(method_id) == str:
                                 continue
