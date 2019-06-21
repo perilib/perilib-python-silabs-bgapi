@@ -111,9 +111,9 @@ class SilabsBGAPIProtocol(perilib.StreamProtocol):
                     SilabsBGAPIProtocol.events[technology_type][group_id][method_id]["name"])
         except KeyError as e:
             raise perilib.PerilibProtocolException(
-                            "Could not find packet definition for "
+                            "Could not find packet definition for %s with "
                             "technology type %d, group %d, and method %d" \
-                            % (technology_type, group_id, method_id))
+                            % (SilabsBGAPIPacket.TYPE_STR[packet_type], technology_type, group_id, method_id))
 
         packet_definition["header_args"] = SilabsBGAPIProtocol.header_args
 
