@@ -75,7 +75,7 @@ class SilabsBGAPIProtocol(perilib.StreamProtocol):
             (payload_length,) = struct.unpack(">H", buffer[0:2])
             payload_length = payload_length & 0x3FF
             if len(buffer) == payload_length + 4:
-                return perilib.ParseStatus.COMPLETE
+                return perilib.ParseStatus.COMPLETE if buffer != "\x00\x00\x00\x00" else perilib.ParseStatus.IDLE
 
         # not finished if we made it here
         return perilib.ParseStatus.IN_PROGRESS
