@@ -32,38 +32,255 @@ class SilabsBGAPIProtocol(perilib.StreamProtocol):
     incoming_packet_timeout = 1.2
 
     commands = {
-        0: { # technology_type = 0x0 (BLE)
+        0x0: { # technology_type = 0x0 (BLE)
             "name": "ble",
-            0: { # group_id = 0x00 (system)
+            0x00: { # group_id = 0x00 (system)
                 "name": "system",
-                1: { # method_id = 0x01 (system_hello)
+                0x01: { # method_id = 0x01 (system_hello)
                     "name": "hello",
+                    "response_required": "ble_rsp_system_hello",
                     "command_args": [],
                     "response_args": [],
                 },
             },
         },
 
-        1: { # technology_type = 0x1 (Wifi)
+        0x1: { # technology_type = 0x1 (Wifi)
             "name": "wifi",
         },
 
-        4: { # technology_type = 0x4 (Dumo)
+        0x4: { # technology_type = 0x4 (Dumo)
             "name": "dumo",
+            0x01: { # group_id = 0x01 (system)
+                "name": "system",
+                0x00: { # method_id = 0x00 (system_hello)
+                    "name": "hello",
+                    "response_required": "dumo_rsp_system_hello",
+                    "command_args": [],
+                    "response_args": [
+                        { "name": "result", "type": "uint16" },
+                    ],
+                },
+                0x08: { # method_id = 0x08 (system_set_local_name)
+                    "name": "set_local_name",
+                    "response_required": "dumo_rsp_system_set_local_name",
+                    "command_args": [
+                        { "name": "name", "type": "uint8a-l8v" },
+                    ],
+                    "response_args": [
+                        { "name": "result", "type": "uint16" },
+                    ],
+                },
+            },
+            0x02: { # group_id = 0x02 (bt_gap)
+                "name": "bt_gap",
+                0x03: { # method_id = 0x03 (bt_gap_set_mode)
+                    "name": "set_mode",
+                    "response_required": "dumo_rsp_bt_gap_set_mode",
+                    "command_args": [
+                        { "name": "connectable", "type": "uint8" },
+                        { "name": "discoverable", "type": "uint8" },
+                        { "name": "limited", "type": "uint8" },
+                    ],
+                    "response_args": [
+                        { "name": "result", "type": "uint16" },
+                    ],
+                },
+            },
+            0x04: { # group_id = 0x04 (bt_rfcomm)
+                "name": "bt_rfcomm",
+                0x01: { # method_id = 0x01 (bt_rfcomm_start_server)
+                    "name": "start_server",
+                    "response_required": "dumo_rsp_bt_rfcomm_start_server",
+                    "command_args": [
+                        { "name": "sdp_id", "type": "uint8" },
+                        { "name": "streaming_destination", "type": "uint8" },
+                    ],
+                    "response_args": [
+                        { "name": "result", "type": "uint16" },
+                    ],
+                },
+            },
+            0x0B: { # group_id = 0x0B (endpoint)
+                "name": "endpoint",
+                0x00: { # method_id = 0x00 (endpoint_send)
+                    "name": "send",
+                    "response_required": "dumo_rsp_endpoint_send",
+                    "command_args": [
+                        { "name": "endpoint", "type": "uint8" },
+                        { "name": "data", "type": "uint8a-l8v" },
+                    ],
+                    "response_args": [
+                        { "name": "result", "type": "uint16" },
+                    ],
+                },
+            },
+            0x0C: { # group_id = 0x0C (hardware)
+                "name": "hardware",
+                0x08: { # method_id = 0x08 (hardware_set_uart_configuration)
+                    "name": "set_uart_configuration",
+                    "response_required": "dumo_rsp_hardware_set_uart_configuration",
+                    "command_args": [
+                        { "name": "endpoint", "type": "uint8" },
+                        { "name": "rate", "type": "uint32" },
+                        { "name": "data_bits", "type": "uint8" },
+                        { "name": "stop_bits", "type": "uint8" },
+                        { "name": "parity", "type": "uint8" },
+                        { "name": "flow_ctrl", "type": "uint8" },
+                    ],
+                    "response_args": [
+                        { "name": "result", "type": "uint16" },
+                    ],
+                },
+            },
+            0x0F: { # group_id = 0x0F (sm)
+                "name": "sm",
+                0x00: { # method_id = 0x00 (sm_set_bondable_mode)
+                    "name": "set_bondable_mode",
+                    "response_required": "dumo_rsp_sm_set_bondable_mode",
+                    "command_args": [
+                        { "name": "bondable", "type": "uint8" },
+                    ],
+                    "response_args": [
+                        { "name": "result", "type": "uint16" },
+                    ],
+                },
+            },
         }
     }
 
     events = {
-        0: { # technology_type = 0x0 (BLE)
+        0x0: { # technology_type = 0x0 (BLE)
             "name": "ble",
         },
 
-        1: { # technology_type = 0x1 (Wifi)
+        0x1: { # technology_type = 0x1 (Wifi)
             "name": "wifi",
         },
 
-        2: { # technology_type = 0x4 (Dumo)
+        0x4: { # technology_type = 0x4 (Dumo)
             "name": "dumo",
+            0x01: { # group_id = 0x01 (system)
+                "name": "system",
+                0x00: { # method_id = 0x00 (system_boot)
+                    "name": "boot",
+                    "event_args": [
+                        { "name": "major", "type": "uint16" },
+                        { "name": "minor", "type": "uint16" },
+                        { "name": "patch", "type": "uint16" },
+                        { "name": "build", "type": "uint16" },
+                        { "name": "bootloader", "type": "uint16" },
+                        { "name": "hw", "type": "uint16" },
+                    ],
+                },
+                0x01: { # method_id = 0x01 (system_initialized)
+                    "name": "initialized",
+                    "event_args": [
+                        { "name": "address", "type": "macaddr" },
+                    ],
+                },
+                0x02: { # method_id = 0x01 (system_recovery)
+                    "name": "recovery",
+                    "event_args": [
+                        { "name": "id1", "type": "uint32" },
+                        { "name": "id2", "type": "uint32" },
+                        { "name": "data", "type": "uint8a-l8v" },
+                    ],
+                },
+            },
+            0x04: { # group_id = 0x04 (bt_rfcomm)
+                "name": "bt_rfcomm",
+                0x01: { # method_id = 0x01 (bt_rfcomm_modem_status)
+                    "name": "modem_status",
+                    "event_args": [
+                        { "name": "endpoint", "type": "uint8" },
+                        { "name": "modem", "type": "uint8" },
+                    ],
+                },
+            },
+            0x07: { # group_id = 0x07 (bt_connection)
+                "name": "bt_connection",
+                0x00: { # method_id = 0x00 (bt_connection_opened)
+                    "name": "opened",
+                    "event_args": [
+                        { "name": "address", "type": "macaddr" },
+                        { "name": "master", "type": "uint8" },
+                        { "name": "connection", "type": "uint8" },
+                        { "name": "bonding", "type": "uint8" },
+                    ],
+                },
+                0x01: { # method_id = 0x01 (bt_connection_closed)
+                    "name": "closed",
+                    "event_args": [
+                        { "name": "reason", "type": "uint16" },
+                        { "name": "endpoint", "type": "uint8" },
+                    ],
+                },
+                0x02: { # method_id = 0x02 (bt_connection_parameters)
+                    "name": "parameters",
+                    "event_args": [
+                        { "name": "endpoint", "type": "uint8" },
+                        { "name": "block_size", "type": "uint32" },
+                        { "name": "msc", "type": "uint8" },
+                        { "name": "address", "type": "macaddr" },
+                        { "name": "direction", "type": "uint8" },
+                        { "name": "powermode", "type": "uint8" },
+                        { "name": "role", "type": "uint8" },
+                        { "name": "encryption", "type": "uint8" },
+                        { "name": "input_buffer", "type": "uint32" },
+                        { "name": "port", "type": "uint8" },
+                    ],
+                },
+            },
+            0x0B: { # group_id = 0x0B (endpoint)
+                "name": "endpoint",
+                0x00: { # method_id = 0x00 (endpoint_syntax_error)
+                    "name": "syntax_error",
+                    "event_args": [
+                        { "name": "result", "type": "uint16" },
+                        { "name": "endpoint", "type": "uint8" },
+                    ],
+                },
+                0x01: { # method_id = 0x01 (endpoint_data)
+                    "name": "data",
+                    "event_args": [
+                        { "name": "endpoint", "type": "uint8" },
+                        { "name": "data", "type": "uint8a-l8v" },
+                    ],
+                },
+                0x02: { # method_id = 0x02 (endpoint_status)
+                    "name": "status",
+                    "event_args": [
+                        { "name": "endpoint", "type": "uint8" },
+                        { "name": "type", "type": "uint32" },
+                        { "name": "destination_endpoint", "type": "int8" },
+                        { "name": "flags", "type": "uint8" },
+                    ],
+                },
+                0x03: { # method_id = 0x03 (endpoint_closing)
+                    "name": "closing",
+                    "event_args": [
+                        { "name": "reason", "type": "uint16" },
+                        { "name": "endpoint", "type": "uint8" },
+                    ],
+                },
+                0x04: { # method_id = 0x04 (endpoint_closed)
+                    "name": "closed",
+                    "event_args": [
+                        { "name": "endpoint", "type": "uint8" },
+                    ],
+                },
+            },
+            0x0F: { # group_id = 0x0F (sm)
+                "name": "sm",
+                0x03: { # method_id = 0x03 (sm_bonded)
+                    "name": "bonded",
+                    "event_args": [
+                        { "name": "connection", "type": "uint8" },
+                        { "name": "bonding", "type": "uint8" },
+                    ],
+                },
+            },
         }
     }
 
